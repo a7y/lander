@@ -50,7 +50,7 @@ func handlePost(w http.ResponseWriter, r *http.Request) {
 
 	s := Subscriber{
 		Email: r.Form.Get("email"),
-		Host:  r.RemoteAddr,
+		Host:  getIp(r),
 		When:  time.Now().String(),
 	}
 
@@ -69,4 +69,13 @@ func handlePost(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(json)
+}
+
+func getIp(r *http.Request) string {
+	// this is actually not reliable but ¯\_(ツ)_/¯
+	if r.Header.Get("X-FORWARDED-FOR") != "" {
+		return r.Header.Get("X-FORWARDED-FOR")
+	}
+
+	return r.RemoteAddr
 }
